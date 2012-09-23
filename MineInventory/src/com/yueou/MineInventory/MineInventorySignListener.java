@@ -250,6 +250,9 @@ public class MineInventorySignListener implements Listener{
 
 
 		item.setAmount(itemnum-price);
+		if(itemnum-price==0){
+			player.setItemInHand(null);
+		}
 		inventorymap.saveInventory(playername);
        	System.out.println("Inventory of "+ playername +" level up!");
        	

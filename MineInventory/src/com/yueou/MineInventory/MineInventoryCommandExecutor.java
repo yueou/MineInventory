@@ -596,6 +596,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                         Inventory targetinventory = inventorymap.getInventory(targetplayer).getInventory();
                         
                         ListIterator<ItemStack> pinvlist = playerinventory.iterator();
+                        
                         ListIterator<ItemStack> tinvlist = targetinventory.iterator();
                         int size = targetinventory.getSize();
                         int amount = 0;
@@ -605,6 +606,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                         	}
                         }
                         
+                        int oldamount = amount;
                         ItemStack item = null;
                         
                         for(int i=0;pinvlist.hasNext();i++){
@@ -618,6 +620,11 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                         	targetinventory.addItem(item);
                         	playerinventory.setItem(i, null);
                         	amount++;
+                        }
+                        
+                        if(amount==oldamount){
+                        	player.sendMessage(ChatColor.RED+"你的扩展背包是空的!");
+                        	return true;
                         }
                         
                         player.sendMessage("物品已发送!");
