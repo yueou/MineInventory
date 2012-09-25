@@ -1,0 +1,23 @@
+name: MineInventory
+main: com.yueou.MineInventory.MineInventory
+version: 0.8
+author: yueou
+description: >
+             Set a extra inventory for a player to open it wherever
+commands:
+  mi:
+    description: the commands for MineInventory
+    permission:  
+    usage: /mi help
+permissions:
+    mi.*:
+        description: Gives access to all MineInventory commands
+        children:
+            mi.use: true
+            mi.admin: true
+    mi.use:
+        description: 'Allows to use  MineInventory'
+        default: op
+    mi.admin:
+        description: 'Admin permissions for admins'
+        default: op

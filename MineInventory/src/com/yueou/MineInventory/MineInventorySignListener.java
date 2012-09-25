@@ -51,7 +51,6 @@ public class MineInventorySignListener implements Listener{
 			return;
 		
 		Player player = bpe.getPlayer();
-		//String playername = player.getName();
 		
 		Sign sign = (Sign)bpe.getBlock().getState();
 		
