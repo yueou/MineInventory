@@ -3,9 +3,6 @@ package com.yueou.MineInventory;
 import java.util.ListIterator;
 
 //import org.bukkit.Material;
-//import org.bukkit.Bukkit;
-//import org.bukkit.block.DoubleChest;
-//import org.bukkit.craftbukkit.block.CraftChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 //import org.bukkit.event.block.BlockDamageEvent;
@@ -66,6 +63,8 @@ public class MineInventoryListener implements Listener{
 		//TODO:在下面进行数据库操作调用 进行背包数据存储
 		
 		plugin.getMap().saveInventory(name);
+
+		//plugin.getChannel().sendClose((Player)pqe.getPlayer());
 				
 		
 	}
@@ -150,10 +149,11 @@ public class MineInventoryListener implements Listener{
 		String targetplayername = minv.getOwner();
 		
 		plugin.getMap().saveInventory(targetplayername);
-		
-		
+		if(((Player)ice.getPlayer()).getName().equalsIgnoreCase(minv.getOwner())&&minv.stat==true){
+			minv.stat = false;	
+			plugin.getChannel().sendClose((Player)ice.getPlayer());
+		}
 	}
-
 	
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onChestOpen(InventoryOpenEvent ioe){
@@ -251,104 +251,31 @@ public class MineInventoryListener implements Listener{
 
 	}
 	
-	/*
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBlockDamage(BlockDamageEvent bde){
-		String playername = bde.getPlayer().getName();
-		Player player = plugin.getServer().getPlayer(playername);
-		String lastcmd =plugin.getCommandMap().getLastCommand(playername);
+	public void onPlayerInventoryOpen(InventoryOpenEvent event){
 		
-		if(lastcmd==null){
+		//Bukkit.broadcastMessage("1");
+		
+		Inventory inv = event.getInventory();
+		/*
+		if(!(inv instanceof PlayerInventory)){
 			return;
 		}
-		Chest selectedchest =null;
-		Inventory chestinventory = null;
-		Inventory playerinventory = null;
-		ListIterator<ItemStack> itemlist = null;
-		ListIterator<ItemStack> citemlist = null;
+		*/
 		
-		if(lastcmd.compareTo("tochest")==0){
+		Player player = (Player) event.getPlayer();
 
-			if(bde.getBlock().getType()!=Material.CHEST){
-				player.sendMessage("[MineInventory]: 你选择的方块不是一个箱子。");
-				plugin.getCommandMap().removeLastCommand(playername);
-				return;
+		//Bukkit.broadcastMessage("1");
+		if(inv.getHolder() instanceof MineInventoryInventory){
+
+			//Bukkit.broadcastMessage("2");
+
+			if(player.getName().equalsIgnoreCase(((MineInventoryInventory)inv.getHolder()).getOwner())){
+				plugin.getChannel().sendOpen(player);
+				((MineInventoryInventory)inv.getHolder()).stat = true;	
 			}
-			
-			selectedchest = (Chest)bde.getBlock().getState();
-			
-			chestinventory = selectedchest.getInventory();
-			playerinventory = plugin.getMap().getMap().get(playername).getInventory();
-			
-			itemlist = playerinventory.iterator();
-			citemlist = chestinventory.iterator();
-			ItemStack item = null; 
-			int chestamount = 0;
-			while(citemlist.hasNext()){
-				if(citemlist.next()!=null)
-					chestamount++;
-			}
-			
-			for(int i=0;itemlist.hasNext();i++){
-				item = (ItemStack) itemlist.next();
-				if(item==null)continue;
-				if(chestamount==chestinventory.getSize()){
-					player.sendMessage("[MineInventory]: 箱子空间不足，物品未能完全转移");
-					break;
-				}
-				chestinventory.addItem(item);
-				playerinventory.setItem(i, null);
-				chestamount++;
-			}
-			
-			player.sendMessage("[MineInventory]: 额外背包内的物品已转移到箱子中");
-			
-		}
-		else if(lastcmd.compareTo("topack")==0){
-			if(bde.getBlock().getType()!=Material.CHEST){
-				player.sendMessage("[MineInventory]: 你选择的方块不是一个箱子。");
-				plugin.getCommandMap().removeLastCommand(playername);
-				return;
-			}
-			
-			
-			selectedchest = (Chest)bde.getBlock().getState();
-			
-			chestinventory = selectedchest.getInventory();
-			
-			playerinventory = plugin.getMap().getMap().get(playername).getInventory();
-			
-			itemlist = playerinventory.iterator();
-			citemlist = chestinventory.iterator();
-			ItemStack item = null; 
-			int chestamount = 0;
-			while(itemlist.hasNext()){
-				if(itemlist.next()!=null)
-					chestamount++;
-			}
-			
-			for(int i=0;citemlist.hasNext();i++){
-				item = (ItemStack) citemlist.next();
-				if(item==null)continue;
-				if(chestamount==playerinventory.getSize()){
-					player.sendMessage("[MineInventory]: 额外背包空间不足，物品未能完全转移");
-					break;
-				}
-				playerinventory.addItem(item);
-				chestinventory.setItem(i, null);
-				chestamount++;
-			}
-			
-			player.sendMessage("[MineInventory]: 箱子内的物品已转移到额外背包中");
-		}
-		else{
 			return;
 		}
-		
-		plugin.getMap().saveInventory(playername);
-		
-		plugin.getCommandMap().removeLastCommand(playername);
 		
 	}
-	*/
 }

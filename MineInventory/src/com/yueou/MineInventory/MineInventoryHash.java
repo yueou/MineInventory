@@ -48,6 +48,9 @@ public class MineInventoryHash {
     	minv.setDrop(tool[1]==1);
     	minv.setSort(tool[2]==1);
     	minv.setSend(tool[3]==1);
+    	minv.setShift(tool[4]==1);
+    	if(tool[5]==1)
+    		minv.Shift();
     	
     	if(data==null||data=="")return false;
     	

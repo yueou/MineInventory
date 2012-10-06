@@ -10,6 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.*;
 
 import com.iCo6.system.Account;
@@ -59,52 +60,19 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
                          else
                          {
-                        	 /*
-                             String name = player.getName();
-                             Block block = plugin.getServer().getWorld("world").getBlockAt(0, 1, 0);
-                             if(block.getType() !=Material.CHEST){
-                            	 player.sendMessage(block.toString());
-                            	 player.sendMessage("未找到背包");
-                            	 return true;
-                             }
-                             chest=(Chest)block.getState();
-                             
-                             if(chest==null){
-                            	 player.sendMessage("发生未知错误");
-                            	 return true;
-                             }
-                             else{
-                            	 Inventory tempinv = chestinv;
-
-                            	 chestinv = chest.getInventory();
-                            	 player.openInventory(chestinv);
-                            	 
-                             }
-                             */
                         	 MineInventoryInventory minv = inventorymap.getInventory(playername);
                         	 
                         	 if(minv == null){
-                        		 player.sendMessage("你没有扩展背包， 使用/mi create 来创建背包");
+                        		 player.sendMessage(ChatColor.RED + "你没有扩展背包， 使用/mi create 来创建背包");
                         		 return true;
                         	 }
-                        	 else{
-                        		 /*
-                        		 ItemStack temp;
-                        		 ListIterator<ItemStack> is;
-                        		 is = inventorymap.getInventory(player).getItems();
-                        		 for(int i=0;is.hasNext();i++){
-                        			 temp=is.next();
-//                        			 if(temp!=null)
-//                        				 player.sendMessage("MI:  "+temp.getTypeId()+" : "+temp.getAmount());
-                        		 }
-                        		 */
-                        		 minv.openInventory(player);
-                        	 }                        	 
+                        	minv.openInventory(player);		 
+                                	 
                         	 
                         	 
                              return true;
@@ -116,18 +84,18 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有创建扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有创建扩展背包的权限.");
                              return true;
                         }
                          else
                          {
                         	 if(inventorymap.getInventory(playername)!=null){
-                        		 player.sendMessage("你已经拥有了扩展背包");
+                        		 player.sendMessage(ChatColor.RED + "你已经拥有了扩展背包");
                         		 return true;
                         	 }
                         	 else{
                         		 
-                        		 player.sendMessage("这个操作将会花费你 "+ createprice +" 元, 请输入/mi confirm 确认操作.");
+                        		 player.sendMessage("这个操作将会花费你 "+ createprice +" 元, 请输入"+ChatColor.YELLOW + "/mi confirm "+ChatColor.WHITE +"确认操作.");
                         		 plugin.getCommandMap().setLastCommand(cmder.getName(), args[0]);
                         		 
                         	 }
@@ -136,23 +104,37 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                          }
         				
         			}
+        			else if(args[0].equalsIgnoreCase("close")){
+                        if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
+                        {
+                             return true;
+                        }
+                        if(player.getOpenInventory().getTopInventory().getHolder() instanceof MineInventoryInventory){
+                         	MineInventoryInventory minv = (MineInventoryInventory)player.getOpenInventory().getTopInventory().getHolder();
+                         	if(minv.getOwner().equalsIgnoreCase(player.getName())){
+                             	plugin.getServer().getPluginManager().callEvent(new InventoryCloseEvent(player.getOpenInventory()));	
+                         	}
+                         	player.closeInventory();
+                        }
+                        return true;
+        			}
         			else if(args[0].equalsIgnoreCase("levelup")){
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                            player.sendMessage("权限不足.");
+                            player.sendMessage(ChatColor.RED + "权限不足.");
                             return true;
                         } 
                         
                         MineInventoryInventory inv = inventorymap.getInventory(playername); 
 	                   	if(inv==null){
-	                   		player.sendMessage("你还没有扩展背包, 无法给背包升级");
+	                   		player.sendMessage(ChatColor.RED + "你还没有扩展背包, 无法给背包升级");
 	                   		return true;
 	                   	}
 	                   	int invsize = inv.getInventory().getSize();
 	                   	if(invsize == 54){
 
-	                   		player.sendMessage("你的背包已经是最大的了, 无法继续升级");
+	                   		player.sendMessage(ChatColor.RED + "你的背包已经是最大的了, 无法继续升级");
 	                   		return true;
 	                   	}
 	                   	
@@ -170,13 +152,13 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
                          else
                          {
                         	 if(inventorymap.getInventory(playername)==null){
-                        		 player.sendMessage("你还没有扩展背包");
+                        		 player.sendMessage(ChatColor.RED + "你还没有扩展背包");
                         		 return true;
                         	 }
                         	 else{
@@ -194,18 +176,18 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
                         else{
 	                       	 if(inventorymap.getInventory(playername)==null){
-	                    		 player.sendMessage("你还没有扩展背包");
+	                    		 player.sendMessage(ChatColor.RED + "你还没有扩展背包");
 	                    		 return true;
 	                    	 }
 	                       	 
 
 	                       	 if(!(inventorymap.getInventory(playername).canDrop()||plugin.getPermissionHandler().has(player, "mi.admin"))){
-	                       		 player.sendMessage("你还没有购买扩展功能: "+ChatColor.GREEN +"背包上的洞");
+	                       		 player.sendMessage(ChatColor.RED + "你还没有购买扩展功能: "+ChatColor.GREEN +"背包上的洞");
 	                       		 return true;
 	                       	 }
 	                       	 
@@ -238,11 +220,11 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         			else if(args[0].equalsIgnoreCase("sort")){
         				if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
                       	if(inventorymap.getInventory(playername)==null){
-                      		 player.sendMessage("你还没有扩展背包");
+                      		 player.sendMessage(ChatColor.RED + "你还没有扩展背包");
                       		 return true;
                       	}
                       	
@@ -259,18 +241,18 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         			else if(args[0].equalsIgnoreCase("tochest")){
                         if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
                         else{
              
 	                       	 if(inventorymap.getInventory(playername)==null){
-	                    		 player.sendMessage("你还没有扩展背包");
+	                    		 player.sendMessage(ChatColor.RED + "你还没有扩展背包");
 	                    		 return true;
 	                    	 }
 	                       	 
 	                       	 if(!(inventorymap.getInventory(playername).canTochest()||plugin.getPermissionHandler().has(player, "mi.admin"))){
-	                       		 player.sendMessage("你还没有购买扩展功能: "+ChatColor.GREEN +"快速装箱");
+	                       		 player.sendMessage(ChatColor.RED + "你还没有购买扩展功能: "+ChatColor.GREEN +"快速装箱");
 	                       		 return true;
 	                       	 }
 	                       	 player.sendMessage("请打开要进行物品转移的箱子");
@@ -283,17 +265,17 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         			else if(args[0].equalsIgnoreCase("topack")){
                         if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
                         else{
 	                       	 if(inventorymap.getInventory(playername)==null){
-	                    		 player.sendMessage("你还没有扩展背包");
+	                    		 player.sendMessage(ChatColor.RED + "你还没有扩展背包");
 	                    		 return true;
 	                    	 }
 
 	                       	 if(!(inventorymap.getInventory(playername).canTochest()||plugin.getPermissionHandler().has(player, "mi.admin"))){
-	                       		 player.sendMessage("你还没有购买扩展功能: "+ChatColor.GREEN +"快速装箱");
+	                       		 player.sendMessage(ChatColor.RED + "你还没有购买扩展功能: "+ChatColor.GREEN +"快速装箱");
 	                       		 return true;
 	                       	 }
 	                       	 player.sendMessage("请打开要进行物品转移的箱子");
@@ -307,7 +289,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
         				if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你没有使用这个命令的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用这个命令的权限.");
                              return true;
                         }
         				
@@ -321,20 +303,20 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
         				String lastcmd = cm.getLastCommand(playername);
         				if(lastcmd==null){
-        					player.sendMessage("不明操作");
+        					player.sendMessage(ChatColor.RED + "不明操作");
         					return true;
         				}
         				
         				else if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
                         
         				else if(lastcmd.equalsIgnoreCase("create")){
         					
                      		 if(account.getHoldings().getBalance()<createprice){
-                    			 player.sendMessage("你的金钱不足");
+                    			 player.sendMessage(ChatColor.RED + "你的金钱不足");
                     			 cm.removeLastCommand(playername);
                     			 return true;
                     		 }
@@ -351,7 +333,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                         		 System.out.println("[MineInventory]Inventory of " + player.getName() +" created.");
                     		 }
                     		 else{
-                    			 player.sendMessage("发生未知错误");
+                    			 player.sendMessage(ChatColor.RED + "发生未知错误");
                     		 }
                     		 
 
@@ -365,7 +347,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         					
             				if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                             {
-                                 player.sendMessage("你没有使用扩展背包的权限.");
+                                 player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                                  return true;
                             }
             				
@@ -380,7 +362,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
 	                   			 System.out.println("[MineInventory]Inventory of " + player.getName() +" removed.");
 	                   		 }
 	                   		 else{
-	                   			 player.sendMessage("发生未知错误");
+	                   			 player.sendMessage(ChatColor.RED + "发生未知错误");
 	                   		 }
 	                   		 
 	                   		 cm.removeLastCommand(playername);
@@ -389,11 +371,11 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				else if(lastcmd.equalsIgnoreCase("levelup")){
             				if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                             {
-                                 player.sendMessage("你没有使用扩展背包的权限.");
+                                 player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                                  return true;
                             }       		
 	                		if(account.getHoldings().getBalance()<luprice){
-	                			player.sendMessage("你的金钱不足");
+	                			player.sendMessage(ChatColor.RED + "你的金钱不足");
 	                			cm.removeLastCommand(playername);
 	                			return true;
 	                		}
@@ -423,7 +405,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
         				if (!(plugin.getPermissionHandler().has(player, "mi.use"))) 
                         {
-                             player.sendMessage("你没有使用扩展背包的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用扩展背包的权限.");
                              return true;
                         }
         				
@@ -445,7 +427,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
         				if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你使用这个命令的权限.");//
+                             player.sendMessage(ChatColor.RED + "你使用这个命令的权限.");//
                              return true;
                         }
         				
@@ -475,12 +457,12 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你没有使用这个命令的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用这个命令的权限.");
                              return true;
                         }
                         Player targetplayer = plugin.getServer().getPlayer(args[1]);
                         if(targetplayer == null){
-                        	player.sendMessage("未找到玩家");
+                        	player.sendMessage(ChatColor.RED + "未找到玩家");
                         	return true;
                         }
                         targetplayername = targetplayer.getName();
@@ -488,7 +470,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                         MineInventoryInventory targetinventory = 	inventorymap.getInventory(targetplayername);
                         
         				if(targetinventory == null){
-        					player.sendMessage("未找到该玩家的扩展背包.");
+        					player.sendMessage(ChatColor.RED + "未找到该玩家的扩展背包.");
         					return true;
         				}
         				player.openInventory(targetinventory.getInventory());
@@ -498,20 +480,20 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你没有使用这个命令的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用这个命令的权限.");
                              return true;
                         }
                         
                         Player targetplayer = plugin.getServer().getPlayer(args[1]);
                         if(targetplayer==null){
                         	
-                        	player.sendMessage("未找到在线玩家,创建失败");
+                        	player.sendMessage(ChatColor.RED + "未找到在线玩家,创建失败");
                         	return true;
                         }
                         String targetplayername = targetplayer.getName();
                         
                         if(inventorymap.getInventory(targetplayername)!=null){
-                        	player.sendMessage("该玩家已经拥有了扩展背包");
+                        	player.sendMessage(ChatColor.RED + "该玩家已经拥有了扩展背包");
                         	return true;
                         }
                         
@@ -526,7 +508,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
 	                		 System.out.println("[MineInventory]Inventory of " + targetplayername +" created.");
 	            		 }
 	            		 else{
-	            			 player.sendMessage("发生未知错误");
+	            			 player.sendMessage(ChatColor.RED + "发生未知错误");
 	            		 }
 	               		 return true;
         			}
@@ -534,24 +516,24 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你没有使用这个命令的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用这个命令的权限.");
                              return true;
                         }
                         Player targetplayer = plugin.getServer().getPlayer(args[1]);
                         if(targetplayer == null){
-                        	player.sendMessage("该玩家不在线,无法清空背包");
+                        	player.sendMessage(ChatColor.RED + "该玩家不在线,无法清空背包");
                         	return true;
                         }
                         
                         String targetplayername = targetplayer.getName();
                         
                         if(targetplayername.compareTo(args[1].toLowerCase())!=0){
-                        	player.sendMessage("清空背包必须使用完全匹配的玩家名");
+                        	player.sendMessage(ChatColor.RED + "清空背包必须使用完全匹配的玩家名");
                         	return true;
                         }
                         
                         if(inventorymap.getInventory(targetplayer)==null){
-                        	player.sendMessage("该玩没有扩展背包");
+                        	player.sendMessage(ChatColor.RED + "该玩没有扩展背包");
                         	return true;
                         }
                         
@@ -611,7 +593,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                         
                         for(int i=0;pinvlist.hasNext();i++){
                         	if(amount==size){
-                        		player.sendMessage("目标玩家扩展背包已满，物品未能完全发送");
+                        		player.sendMessage(ChatColor.RED + "目标玩家扩展背包已满，物品未能完全发送");
                         		break;
                         	}
                         	item = pinvlist.next();
@@ -638,12 +620,12 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				boolean stat;
                         if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你没有使用这个命令的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用这个命令的权限.");
                              return true;
                         }
                         
                         if(inventorymap.getInventory(player.getName())==null){
-                        	player.sendMessage("你还没有扩展背包");
+                        	player.sendMessage(ChatColor.RED + "你还没有扩展背包");
                         	return true;
                         }
                         
@@ -662,14 +644,14 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                         	for(int j=0;j<len;j++){
                         		char c = args[1].charAt(j);
                         		if(c>'9'||c<'0'){
-                                	player.sendMessage("没有找到物品  " + args[1]);
+                                	player.sendMessage(ChatColor.RED + "没有找到物品  " +ChatColor.YELLOW +  args[1]);
                                 	return true;
                         		}
                         	}
                         	itemid = Integer.parseInt(args[1]);
                         	if(Material.getMaterial(itemid)==null){
 
-                            	player.sendMessage("没有找到物品  " + args[1]);
+                            	player.sendMessage(ChatColor.RED + "没有找到物品  " +ChatColor.YELLOW +  args[1]);
                             	return true;
                         	}
                         }
@@ -708,7 +690,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         			if(args[0].equalsIgnoreCase("levelupfor")){
                         if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你没有使用这个命令的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用这个命令的权限.");
                              return true;
                         }
                         
@@ -717,7 +699,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         				
                         if (!(plugin.getPermissionHandler().has(player, "mi.admin"))) 
                         {
-                             player.sendMessage("你没有使用这个命令的权限.");
+                             player.sendMessage(ChatColor.RED + "你没有使用这个命令的权限.");
                              return true;
                         }
                         
@@ -729,7 +711,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                     	for(int j=0;j<len;j++){
                     		char c = args[2].charAt(j);
                     		if(c>'9'||c<'0'){
-                            	player.sendMessage("错误的大小参数  " + args[2]);
+                            	player.sendMessage(ChatColor.RED + "错误的大小参数  " + args[2]);
                             	return true;
                     		}
                     	}
@@ -737,27 +719,27 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
                     	
                         if(targetplayer==null){
                         	
-                        	player.sendMessage("未找到在线玩家,创建失败");
+                        	player.sendMessage(ChatColor.RED + "未找到在线玩家,创建失败");
                         	return true;
                         }
                         String targetplayername = targetplayer.getName();
                         
                         if(inventorymap.getInventory(targetplayername)!=null){
-                        	player.sendMessage("该玩家已经拥有了扩展背包");
+                        	player.sendMessage(ChatColor.RED + "该玩家已经拥有了扩展背包");
                         	return true;
                         }
                         if(size == 0 )
                         {
-                        	player.sendMessage("你在开玩笑?");
+                        	player.sendMessage(ChatColor.RED + "你在开玩笑?");
                         	return true;
                         }
                 
                     	if(size>90){
-                    		player.sendMessage("我擦!这么大的包,你是想逆天啊!?");
+                    		player.sendMessage(ChatColor.RED + "我擦!这么大的包,你是想逆天啊!?");
                     		return true;
                     	}
                     	if(size%9!=0){
-                    		player.sendMessage("背包的大小必须为⑨的倍数");
+                    		player.sendMessage(ChatColor.RED + "背包的大小必须为⑨的倍数");
                     		return true;
                     	}
                     	
@@ -772,7 +754,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
 	                		 System.out.println("[MineInventory]Inventory of " + targetplayername +" created.");
 	            		 }
 	            		 else{
-	            			 player.sendMessage("发生未知错误");
+	            			 player.sendMessage(ChatColor.RED + "发生未知错误");
 	            		 }
 	               		 return true;
         			}
@@ -780,7 +762,7 @@ public class MineInventoryCommandExecutor implements CommandExecutor{
         		}
         	}
         }
-        player.sendMessage("命令无效, 请使用/mi help 来查看详细的命令帮助.");
+        player.sendMessage(ChatColor.RED + "命令无效, 请使用/mi help 来查看详细的命令帮助.");
 		return true;
 	}
 

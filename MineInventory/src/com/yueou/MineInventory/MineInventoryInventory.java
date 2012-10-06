@@ -15,6 +15,9 @@ public class MineInventoryInventory implements InventoryHolder{
 	private boolean drop;
 	private boolean sort;
 	private boolean send;
+	private boolean shift;
+	private boolean shiftstat;
+	public boolean stat;
 	
 	public MineInventoryInventory(String playername,int size){
 		this.playername = playername;
@@ -35,6 +38,11 @@ public class MineInventoryInventory implements InventoryHolder{
 		minventory = Bukkit.createInventory(this, size, prefix);
 		tochest = false;
 		drop = false;
+		sort = false;
+		send = false;
+		shift = false;
+		shiftstat = false;
+		stat = false;
 	}
 	
 	public void openInventory(Player player){
@@ -92,7 +100,21 @@ public class MineInventoryInventory implements InventoryHolder{
 		return send;
 	}
 	
+	public void setShift(boolean shift){
+		this.shift = shift;
+	}
 	
+	public void Shift(){
+		shiftstat = !shiftstat;
+	}
+	
+	public boolean shiftStat(){
+		return shiftstat;
+	}
+	
+	public boolean canShift(){
+		return shift;
+	}
 	
 	public void sortInventory(){
 		ItemStack temp = null;

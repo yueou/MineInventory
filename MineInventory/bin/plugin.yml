@@ -1,6 +1,6 @@
 name: MineInventory
 main: com.yueou.MineInventory.MineInventory
-version: 0.8
+version: 1.0
 author: yueou
 description: >
              Set a extra inventory for a player to open it wherever

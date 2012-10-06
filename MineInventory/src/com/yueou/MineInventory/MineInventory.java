@@ -39,6 +39,7 @@ public class MineInventory extends JavaPlugin{
     private static PermissionHandler permHandler;
     private MineInventoryCommandHash commandmap;
     private MineInventorySignListener signlistener;
+    private MineInventoryChannel channel;
 
     @Override
     public void onEnable()
@@ -71,6 +72,8 @@ public class MineInventory extends JavaPlugin{
             
             signlistener = new MineInventorySignListener(this);
             
+            channel = new MineInventoryChannel(this);
+            
             setupPerms();
             
             PluginManager pm = this.getServer().getPluginManager();
@@ -101,6 +104,7 @@ public class MineInventory extends JavaPlugin{
                 log.info("[MineInventory] Config file does not exist,created.");
                 createFile(configFile, "MineInventory.properties");
         }
+        channel = new MineInventoryChannel(this);
         reader = new MineInventoryConfigReader();     
         databaseHandler = new MineInventoryDataBaser(reader.getHostname(),reader.getDataBase(),reader.getUsername(),reader.getPassword(),reader.getPort(),reader.getPrefix(),this);  
         mineinventorymap = new MineInventoryHash(this);       
@@ -276,6 +280,8 @@ public class MineInventory extends JavaPlugin{
 				tool[1] = result.getShort("CanDrop");
 				tool[2] = result.getShort("CanSort");
 				tool[3] = result.getShort("CanSend");
+				tool[4] = result.getShort("Pre1");
+				tool[5] = result.getShort("Pre2");
 				mineinventorymap.loadInventory(playername.toLowerCase(), inventorynumber, inventorydata ,tool);
 			}
 		} catch (SQLException e) {
@@ -286,5 +292,7 @@ public class MineInventory extends JavaPlugin{
     	
     	System.out.println("[MineInventory] "+i +" inventories loaded.");
     }
-
+    public MineInventoryChannel getChannel(){
+    	return channel;
+    }
 }
