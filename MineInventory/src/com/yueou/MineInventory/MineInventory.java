@@ -16,13 +16,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
  
+import net.milkbowl.vault.permission.Permission;
+
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
  
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
  
 public class MineInventory extends JavaPlugin{
 	
@@ -36,7 +37,7 @@ public class MineInventory extends JavaPlugin{
     private MineInventoryCommandExecutor executor;
     private MineInventoryHash mineinventorymap;
     private MineInventoryListener mineinventorylistener;
-    private static PermissionHandler permHandler;
+    private static Permission permHandler;
     private MineInventoryCommandHash commandmap;
     private MineInventorySignListener signlistener;
     private MineInventoryChannel channel;
@@ -185,22 +186,15 @@ public class MineInventory extends JavaPlugin{
    }
 
     
-    private void setupPerms()
+    private boolean setupPerms()
     {
-    	if (permHandler != null) {
-            return;
-        }
-        
-        Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
-        
-        if (permissionsPlugin == null) {
-            log.info("[MineInventory]Permission system not found");
-            return;
-        }
-        
-       permHandler = ((Permissions) permissionsPlugin).getHandler();
-        log.info("[MineInventory] Permission system found. Will use plugin "+((Permissions)permissionsPlugin).getDescription().getFullName());
-    }
+		RegisteredServiceProvider<Permission> permissionProvider = getServer()
+				.getServicesManager().getRegistration(
+						net.milkbowl.vault.permission.Permission.class);
+		if (permissionProvider != null) {
+			permHandler = permissionProvider.getProvider();
+		}
+		return (permHandler != null); }
     
     public MineInventoryHash getMap(){
     	
@@ -240,7 +234,7 @@ public class MineInventory extends JavaPlugin{
     	return username;
     }
     
-    public PermissionHandler getPermissionHandler()
+    public Permission getPermissionHandler()
     {
     	return permHandler;
     }

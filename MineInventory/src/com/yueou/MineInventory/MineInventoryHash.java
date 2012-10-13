@@ -3,7 +3,12 @@ package com.yueou.MineInventory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
+import net.minecraft.server.ItemTool;
+
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +47,7 @@ public class MineInventoryHash {
     	String itemset[];
     	MineInventoryInventory minv;
     	ItemStack item;
-    	
+
     	minv = new MineInventoryInventory(playername.toLowerCase(),size);
     	minv.setTochest(tool[0]==1);
     	minv.setDrop(tool[1]==1);
@@ -56,16 +61,53 @@ public class MineInventoryHash {
     	
     	itemset = data.split(":");
     	int i,j,n;
+    	short duar = 0;
+    	String enchantstr = null;
     	for(i=0,j=0,n=0;i<itemset.length;i++,j++){
-    		int itemtype = Integer.parseInt(itemset[i]);
-    		
-    		if(itemtype!=0)n++;
-    		
-    		item = new ItemStack(itemtype);
-    		i++;
-    		
-    		item.setAmount(Integer.parseInt(itemset[i]));
-        	minv.getInventory().setItem(j, item); 
+    		if(!itemset[i].equals("0")){
+    			if(itemset[i].contains(";")){			
+    				String itemdata[]=itemset[i].split(";");
+    				if(itemdata.length==2){
+    					duar = (short)Integer.parseInt(itemdata[1]);
+    				}
+    				else{
+    					enchantstr = itemdata[1];
+    					duar = (short)Integer.parseInt(itemdata[itemdata.length-1]);
+    					
+    				}
+	        		int itemtype = Integer.parseInt(itemdata[0]);
+	        		
+	        		if(itemtype!=0)n++;
+	        		
+	        		item = new ItemStack(itemtype);
+	        		item.setDurability(duar);
+	        		if(itemdata.length>2){
+	        			for(int k=1;k<itemdata.length-1;k++){
+	        				Enchantment enchant = Enchantment.getById(Integer.parseInt(itemdata[k]));
+	        				System.out.println(enchant.getName());
+	        				k++;
+	        				int level = Integer.parseInt(itemdata[k]);
+	        				item.addEnchantment(enchant, level);
+	        			}
+	        			
+	        		}
+	        		i++;
+	        		
+	        		item.setAmount(Integer.parseInt(itemset[i]));
+	            	minv.getInventory().setItem(j, item); 
+    			}
+    			else{
+	        		int itemtype = Integer.parseInt(itemset[i]);
+	        		
+	        		if(itemtype!=0)n++;
+	        		
+	        		item = new ItemStack(itemtype);
+	        		i++;
+	        		
+	        		item.setAmount(Integer.parseInt(itemset[i]));
+	            	minv.getInventory().setItem(j, item); 
+    			}
+    		}
     	}
     	
     	this.addInventory(playername.toLowerCase(), minv);
@@ -111,11 +153,30 @@ public class MineInventoryHash {
 				}				
 			}
 			else{
+				int id = is.getTypeId();
+				String isdata = is.getTypeId()+"";
+				String enchantdatas = "";
+				if((id>=256&&id<=258)||(id>=267&&id<=279)||(id>=283&&id<=286)||(id>=290&&id<=294)||(id>=298&&id<=317)){
+					Map<Enchantment,Integer> isec = is.getEnchantments();
+					Object[] isecset = isec.keySet().toArray();
+					int dura = is.getDurability();
+					for(Object e : isecset){
+						int level = is.getEnchantmentLevel((Enchantment)e);
+						int enid = ((Enchantment)e).getId();
+						if(enchantdatas.equals(";"))
+							enchantdatas=";"+enid+";"+level;
+						else
+							enchantdatas=enchantdatas+";"+enid+";"+level;
+					}
+					isdata+=enchantdatas;
+					isdata+=(";"+is.getDurability());
+					
+				}
 				if(invinfo.compareTo("")==0){
-					invinfo = invinfo+is.getTypeId()+":"+is.getAmount();
+					invinfo = invinfo+isdata+":"+is.getAmount();
 				}
 				else{
-					invinfo=invinfo+":"+is.getTypeId()+":"+is.getAmount();
+					invinfo=invinfo+":"+isdata+":"+is.getAmount();
 				}				
 			}
 		}
