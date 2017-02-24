@@ -3,9 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="F:/服务端/craftbukkit-1.2.5-FML-R4.1-SNAPSHOT-76.jar"/>
-	<classpathentry kind="lib" path="F:/服务端/Permissions.jar"/>
-	<classpathentry kind="lib" path="F:/服务端/plugins/Vault.jar"/>
-	<classpathentry kind="lib" path="F:/服务端/plugins/iConomy.jar"/>
+	<classpathentry kind="lib" path="F:/Users/yueou/Documents/plugins/spigot-1.8.jar"/>
+	<classpathentry kind="lib" path="F:/Users/yueou/Documents/plugins/Vault.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

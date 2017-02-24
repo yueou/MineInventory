@@ -1,16 +1,18 @@
 package com.yueou.MineInventory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
-public class MineInventoryInventory implements InventoryHolder{
-
+public class MineInventoryInventory implements InventoryHolder {
 	protected Inventory minventory;
-	private String playername;
 	private boolean tochest;
 	private boolean drop;
 	private boolean sort;
@@ -18,138 +20,229 @@ public class MineInventoryInventory implements InventoryHolder{
 	private boolean shift;
 	private boolean shiftstat;
 	public boolean stat;
-	
-	public MineInventoryInventory(String playername,int size){
-		this.playername = playername;
-		String prefix = "不科学背包";
-		if(size <= 9)
-			prefix = "苦逼小破包";
-		else if(size <= 18)
-			prefix = "扩展背包";
-		else if(size <= 27)
-			prefix = "大容量背包";
-		else if(size <= 36)
-			prefix = "海量背包";
-		else if(size <= 45)
-			prefix = "四维空间背包";
-		else if(size <= 54)
-			prefix = "超次元背包";
-		
-		minventory = Bukkit.createInventory(this, size, prefix);
-		tochest = false;
-		drop = false;
-		sort = false;
-		send = false;
-		shift = false;
-		shiftstat = false;
-		stat = false;
+	private boolean locked;
+	private Player owner;
+	private List<Integer> stackids;
+	private String ownerName;
+
+	public MineInventoryInventory(String ownerName, int size) {
+		this.ownerName = ownerName;
+		this.owner = MineInventory.instance.getServer().getPlayer(ownerName);
+		List<String> names = MineInventoryConfigReader.instance
+				.getBagNameList();
+		String prefix = names.get(6);
+		if (size <= 9) {
+			prefix = names.get(0);
+		} else if (size <= 18) {
+			prefix = names.get(1);
+		} else if (size <= 27) {
+			prefix = names.get(2);
+		} else if (size <= 36) {
+			prefix = names.get(3);
+		} else if (size <= 45) {
+			prefix = names.get(4);
+		} else if (size <= 54) {
+			prefix = names.get(5);
+		}
+		prefix = ownerName + " 的 " + prefix;
+
+		this.minventory = Bukkit.createInventory(this, size, prefix);
+		this.tochest = false;
+		this.drop = false;
+		this.sort = false;
+		this.send = false;
+		this.shift = false;
+		this.shiftstat = false;
+		this.stat = false;
+		this.locked = false;
+		this.stackids = new ArrayList<Integer>();
 	}
-	
-	public void openInventory(Player player){
-		player.openInventory(minventory);
+
+	public void openInventory(Player player) {
+		player.openInventory(this.minventory);
 	}
-	
-	@Override
+
 	public Inventory getInventory() {
-		// TODO Auto-generated method stub
-		return minventory;
+		return this.minventory;
 	}
-	
-	
-	public String getOwner(){
-		return playername;
+
+	public Player getOwner() {
+		return this.owner;
 	}
-	
-	public ListIterator<ItemStack> getItems(){
-		
-		ListIterator<ItemStack> itemlist;
-		itemlist = minventory.iterator();
+
+	public String getOwnerName() {
+		return this.ownerName;
+	}
+
+	public ListIterator<org.bukkit.inventory.ItemStack> getItems() {
+		ListIterator<org.bukkit.inventory.ItemStack> itemlist = this.minventory
+				.iterator();
 		return itemlist;
-		
 	}
-	
-	public void setTochest(boolean tochest){
-		this.tochest = tochest; 
+
+	public boolean levelUp() {
+		ListIterator<org.bukkit.inventory.ItemStack> list = this.minventory
+				.iterator();
+
+		int size = this.minventory.getSize();
+
+		if (size >= 54)
+			return false;
+		size += 9;
+
+		List<String> names = MineInventoryConfigReader.instance
+				.getBagNameList();
+		String prefix = names.get(6);
+		if (size <= 9) {
+			prefix = names.get(0);
+		} else if (size <= 18) {
+			prefix = names.get(1);
+		} else if (size <= 27) {
+			prefix = names.get(2);
+		} else if (size <= 36) {
+			prefix = names.get(3);
+		} else if (size <= 45) {
+			prefix = names.get(4);
+		} else if (size <= 54) {
+			prefix = names.get(5);
+		}
+		prefix = ownerName + " 的 " + prefix;
+
+		this.minventory = Bukkit.createInventory(this, size, prefix);
+
+		for (int i = 0; list.hasNext(); i++) {
+			this.minventory.setItem(i,
+					(org.bukkit.inventory.ItemStack) list.next());
+		}
+
+		return true;
 	}
-	
-	public boolean canTochest(){
-		return tochest;
+
+	public boolean levelUpToLargest() {
+		ListIterator<org.bukkit.inventory.ItemStack> list = this.minventory
+				.iterator();
+
+		int size = this.minventory.getSize();
+
+		if (size >= 54)
+			return false;
+		size = 54;
+
+		String prefix = MineInventory.instance.getreader().getBagNameList()
+				.get(5);
+
+		this.minventory = Bukkit.createInventory(this, size, prefix);
+
+		for (int i = 0; list.hasNext(); i++) {
+			this.minventory.setItem(i,
+					(org.bukkit.inventory.ItemStack) list.next());
+		}
+
+		return true;
 	}
-	
-	public void setDrop(boolean drop){
-		this.drop = drop; 
+
+	public void setTochest(boolean tochest) {
+		this.tochest = tochest;
 	}
-	
-	public boolean canDrop(){
-		return drop;
+
+	public boolean canTochest() {
+		return this.tochest;
 	}
-	
-	public void setSort(boolean sort){
-		this.sort = sort; 
+
+	public void setDrop(boolean drop) {
+		this.drop = drop;
 	}
-	
-	public boolean canSort(){
-		return sort;
+
+	public boolean canDrop() {
+		return this.drop;
 	}
-	
-	public void setSend(boolean send){
-		this.send = send; 
+
+	public void setSort(boolean sort) {
+		this.sort = sort;
 	}
-	
-	public boolean canSend(){
-		return send;
+
+	public void lockInventory(boolean lock) {
+		this.locked = lock;
 	}
-	
-	public void setShift(boolean shift){
+
+	public boolean locked() {
+		return this.locked;
+	}
+
+	public boolean canSort() {
+		return this.sort;
+	}
+
+	public void setSend(boolean send) {
+		this.send = send;
+	}
+
+	public boolean canSend() {
+		return this.send;
+	}
+
+	public void setShift(boolean shift) {
 		this.shift = shift;
 	}
-	
-	public void Shift(){
-		shiftstat = !shiftstat;
+
+	public void Shift() {
+		this.shiftstat = (!this.shiftstat);
 	}
-	
-	public boolean shiftStat(){
-		return shiftstat;
+
+	public boolean shiftStat() {
+		return this.shiftstat;
 	}
-	
-	public boolean canShift(){
-		return shift;
+
+	public boolean canShift() {
+		return this.shift;
 	}
-	
-	public void sortInventory(){
-		ItemStack temp = null;
-		
-		ListIterator<ItemStack> itemlist = minventory.iterator();
+
+	public void addStackIDs(int id) {
+		this.stackids.add(Integer.valueOf(id));
+	}
+
+	public List<Integer> getStackIDs() {
+		return this.stackids;
+	}
+
+	public int getStackIdAt(int pos) {
+		return ((Integer) this.stackids.get(pos)).intValue();
+	}
+
+	public void sortInventory() {
+		org.bukkit.inventory.ItemStack temp = null;
+
+		ListIterator<ItemStack> itemlist = this.minventory.iterator();
 		ArrayList<ItemStack> itemarray = new ArrayList<ItemStack>();
 		ArrayList<ItemStack> newitemarray = new ArrayList<ItemStack>();
-		int i,j;
-		for(i=0;itemlist.hasNext();i++){
-			temp = itemlist.next();
-			if(temp==null)continue;
-			
-			itemarray.add(temp);
+
+		for (int i = 0; itemlist.hasNext(); i++) {
+			temp = (org.bukkit.inventory.ItemStack) itemlist.next();
+			if (temp != null)
+				itemarray.add(temp);
 		}
 		int amount = itemarray.size();
 		int min = 0;
-		for(i=0;i<amount;i++){
+		for (int i = 0; i < amount; i++) {
 			min = 0;
-			for(j=1;j<amount-i;j++){
-				
-				if(itemarray.get(min).getTypeId()>itemarray.get(j).getTypeId()){
+			for (int j = 1; j < amount - i; j++) {
+				if (((org.bukkit.inventory.ItemStack) itemarray.get(min))
+						.getTypeId() > ((org.bukkit.inventory.ItemStack) itemarray
+						.get(j)).getTypeId()) {
 					min = j;
 				}
 			}
-			newitemarray.add(itemarray.get(min));
+			newitemarray.add((org.bukkit.inventory.ItemStack) itemarray
+					.get(min));
 			itemarray.remove(min);
-			
 		}
-		minventory.clear();
+
+		this.minventory.clear();
 		amount = newitemarray.size();
-		for(i=0;i<amount;i++){
-			minventory.addItem(newitemarray.get(i));
+		for (int i = 0; i < amount; i++) {
+			this.minventory
+					.addItem(new org.bukkit.inventory.ItemStack[] { (org.bukkit.inventory.ItemStack) newitemarray
+							.get(i) });
 		}
-		
 	}
-
-
 }

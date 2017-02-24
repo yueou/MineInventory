@@ -1,281 +1,224 @@
 package com.yueou.MineInventory;
 
-import java.util.ListIterator;
-
-//import org.bukkit.Material;
+import java.io.PrintStream;
+import java.util.List;
+import net.milkbowl.vault.permission.Permission;
+import org.bukkit.ChatColor;
+import org.bukkit.Server;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
-//import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.inventory.FurnaceInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class MineInventoryListener implements Listener{
-	
+public class MineInventoryListener implements Listener {
 	MineInventory plugin;
-	
-	public MineInventoryListener(MineInventory plugin){
-		
+
+	public MineInventoryListener(MineInventory plugin) {
 		this.plugin = plugin;
 	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)	
-	public void onPlayerDisconnect(PlayerQuitEvent pqe){
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	public void onWorldSave(WorldSaveEvent pqe) {
+		plugin.getMap().saveAll();
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onPlayerDisconnect(PlayerQuitEvent pqe) {
 		String name = pqe.getPlayer().getName();
-		//MineInventoryInventory minv = plugin.getMap().getMap().get(name);
-		if(plugin.getMap().getInventory(name)==null){
-			return;
-		}
-		/*
-		ListIterator<ItemStack> invlist;
-		ItemStack is;
-		
-		Inventory inv = minv.getInventory();
-		
-		String invinfo="";
-		
-		invlist = inv.iterator();
-		
-		while(invlist.hasNext()){
-			is = invlist.next();
-			if(is==null){
-				if(invinfo.compareTo("")==0){
-					invinfo = invinfo+"0:0";
-				}
-				else{
-					invinfo=invinfo+":0:0";
-				}				
-			}
-			else{
-				if(invinfo.compareTo("")==0){
-					invinfo = invinfo+is.getTypeId()+":"+is.getAmount();
-				}
-				else{
-					invinfo=invinfo+":"+is.getTypeId()+":"+is.getAmount();
-				}				
-			}
-		}
-		*/
-//		plugin.getServer().getPlayer(ice.getPlayer().getName()).sendMessage("监听到背包关闭事件,背包信息串: "+invinfo);
-		//TODO:在下面进行数据库操作调用 进行背包数据存储
-		
-		plugin.getMap().saveInventory(name);
 
-		//plugin.getChannel().sendClose((Player)pqe.getPlayer());
-				
-		
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onInventoryClose(InventoryCloseEvent ice){
-		
-		
-		//ListIterator<ItemStack> invlist;
-		Inventory inv;
-		//ItemStack is;
-		//String name;
-		
-		//name = ice.getPlayer().getName();
-		inv = ice.getInventory();
-		//TODO 背包判别条件需要修改
+		MineInventoryInventory inv = this.plugin.getMap().getInventory(name);
+		if (inv == null) {
+			return;
+		}
 
-		if(!(inv.getHolder() instanceof MineInventoryInventory)){
-			return;
-		}
-		/*
-		String invinfo="";
-		
-		invlist = inv.iterator();
-		
-		while(invlist.hasNext()){
-			is = invlist.next();
-			if(is==null){
-				if(invinfo.compareTo("")==0){
-					invinfo = invinfo+"0:0";
-				}
-				else{
-					invinfo=invinfo+":0:0";
-				}				
-			}
-			else{
-				if(invinfo.compareTo("")==0){
-					invinfo = invinfo+is.getTypeId()+":"+is.getAmount();
-				}
-				else{
-					invinfo=invinfo+":"+is.getTypeId()+":"+is.getAmount();
-				}				
-			}
-		}
-		
-//		ItemStack temp;
-//		temp = new ItemStack(79);
-//		temp.setAmount(10);
-//		pinv.addItem(temp);
-//		inv.addItem(temp);
-		Bukkit.broadcastMessage(ice.getInventory().toString());
-		Bukkit.broadcastMessage(pinv.toString());
-		//TODO:无法保存，判定条件失败，待修改
-		if(ice.getInventory()!= pinv){
-			
-			
-			return;
-		}*/
-		/*
-		Inventory pinv = plugin.getMap().getMap().get(name).getInventory();
-		String pinvinfo = MineInventoryHash.getInventoryInfo(pinv);
-		
-		if(pinvinfo.compareTo(invinfo)!=0){
-			
-			MineInventoryInventory minv = (MineInventoryInventory)inv.getHolder();
-			
-			String targetplayername = minv.getOwner();
-			
-			String sql = "Update prefix_InventoryData SET invData = '" + invinfo +"' , Amount = " + inv.getSize() + " Where UserName = '" + targetplayername + "';";
-			
-			plugin.updateInventory(sql);
-			
-			System.out.println("[MineInventory]: Inventory of "+ name +" saved.");			
-			return;
-		}
-		*/
-//		plugin.getServer().getPlayer(ice.getPlayer().getName()).sendMessage("监听到背包关闭事件,背包信息串: "+invinfo);
-		//TODO:在下面进行数据库操作调用 进行背包数据存储
-		
-		MineInventoryInventory minv = (MineInventoryInventory)inv.getHolder();
-		
-		String targetplayername = minv.getOwner();
-		
-		plugin.getMap().saveInventory(targetplayername);
-		if(((Player)ice.getPlayer()).getName().equalsIgnoreCase(minv.getOwner())&&minv.stat==true){
-			minv.stat = false;	
-			plugin.getChannel().sendClose((Player)ice.getPlayer());
+		System.out.println(inv.getInventory().getViewers().size());
+		if (inv.getInventory().getViewers().size() == 0) {
+			this.plugin.getMap().saveInventory(name);
+			this.plugin.getMap().removeInventory(name);
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onChestOpen(InventoryOpenEvent ioe){
-		Inventory inv = ioe.getInventory();
-		if(inv.getType()!=InventoryType.CHEST)
-			return;
-		if(inv.getHolder() instanceof MineInventoryInventory){
-			return;
-		}
-		
-		String playername = ioe.getPlayer().getName();
-		String lastcmd =plugin.getCommandMap().getLastCommand(playername);
-		
-		if(lastcmd==null){
-			return;
-		}
-		
-	
-		
-		Player player = plugin.getServer().getPlayer(playername);
-		
-		Inventory chestinventory = ioe.getInventory();
-		Inventory playerinventory = null;
-		ListIterator<ItemStack> itemlist = null;
-		ListIterator<ItemStack> citemlist = null;
-		
-		if(lastcmd.compareTo("tochest")==0){
+	public void onInventoryClose(InventoryCloseEvent ice) {
+		Inventory inv = ice.getInventory();
 
-			
-			playerinventory = plugin.getMap().getInventory(playername).getInventory();
-			
-			itemlist = playerinventory.iterator();
-			citemlist = chestinventory.iterator();
-			ItemStack item = null; 
-			int chestamount = 0;
-			while(citemlist.hasNext()){
-				if(citemlist.next()!=null)
-					chestamount++;
-			}
-			
-			for(int i=0;itemlist.hasNext();i++){
-				item = (ItemStack) itemlist.next();
-				if(item==null)continue;
-				if(chestamount==chestinventory.getSize()){
-					player.sendMessage("箱子空间不足，物品未能完全转移");
-					break;
-				}
-				chestinventory.addItem(item);
-				playerinventory.setItem(i, null);
-				chestamount++;
-			}
-			
-			player.sendMessage("额外背包内的物品已转移到箱子中");
-			
+		if ((inv instanceof FurnaceInventory)) {
+			return;
 		}
-		else if(lastcmd.compareTo("topack")==0){
-			
-			
-			playerinventory = plugin.getMap().getInventory(playername).getInventory();
-			
-			itemlist = playerinventory.iterator();
-			citemlist = chestinventory.iterator();
-			ItemStack item = null; 
-			int chestamount = 0;
-			while(itemlist.hasNext()){
-				if(itemlist.next()!=null)
-					chestamount++;
-			}
-			
-			for(int i=0;citemlist.hasNext();i++){
-				item = (ItemStack) citemlist.next();
-			
-				if(item==null)continue;
-				if(chestamount==playerinventory.getSize()){
-					player.sendMessage("额外背包空间不足，物品未能完全转移");
-					break;
-				}
-				playerinventory.addItem(item);
-				chestinventory.setItem(i, null);
-				chestamount++;
-			}
-			
-			player.sendMessage("箱子内的物品已转移到额外背包中");
-		}
-		else{
+		if (!(inv.getHolder() instanceof MineInventoryInventory)) {
 			return;
 		}
 
-		
-		plugin.getMap().saveInventory(playername);
-		
-		plugin.getCommandMap().removeLastCommand(playername);
-		//ioe.setCancelled(true);
-		
+		MineInventoryInventory minv = (MineInventoryInventory) inv.getHolder();
 
+		Player targetplayer = minv.getOwner();
+
+		if (targetplayer == null) {
+			System.out.println(minv.getInventory().getViewers().size());
+			if (minv.getInventory().getViewers().size() == 1) {
+				this.plugin.getMap().saveInventory(minv);
+				this.plugin.getMap().removeInventory(minv.getOwnerName());
+			}
+		} else if (targetplayer.equals(ice.getPlayer())) {
+			// this.plugin.getMap().saveInventory(targetplayer.getName());
+			if ((((Player) ice.getPlayer()).getName()
+					.equalsIgnoreCase(targetplayer.getName())) && (minv.stat)) {
+				minv.stat = false;
+			}
+		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onPlayerInventoryOpen(InventoryOpenEvent event){
-		
-		//Bukkit.broadcastMessage("1");
-		
+	public void onItemDrag(InventoryDragEvent event) {
+		if (this.plugin.isDebug()) {
+			System.out.println(event.getEventName());
+		}
 		Inventory inv = event.getInventory();
-		/*
-		if(!(inv instanceof PlayerInventory)){
+
+		if (inv == null) {
 			return;
 		}
-		*/
-		
+		Player player = null;
+
+		if ((inv.getHolder() instanceof MineInventoryInventory)) {
+			HumanEntity hentity = (Player) event.getWhoClicked();
+
+			if ((hentity instanceof Player)) {
+				player = (Player) hentity;
+
+				ItemStack item = event.getOldCursor();
+
+				int iid = item.getTypeId();
+
+				List<Integer> blist = this.plugin.getreader()
+						.getItemBlackList();
+
+				if (blist.contains(Integer.valueOf(iid))) {
+					if (!this.plugin.getPermissionHandler().has(player,
+							"mi.admin")) {
+						event.setCancelled(true);
+						player.sendMessage(ChatColor.RED + "该类型的物品被禁止放入扩展背包中");
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onItemClick(InventoryClickEvent event) {
+		if (this.plugin.isDebug()) {
+			System.out.println(event.getEventName());
+		}
+		Inventory inv = event.getClickedInventory();
+
+		if (inv == null) {
+			return;
+		}
+		Player player = null;
+
+		InventoryAction action = event.getAction();
+
+		if (this.plugin.isDebug()) {
+			System.out.println(action.name());
+		}
+		if ((action == InventoryAction.MOVE_TO_OTHER_INVENTORY)
+				|| (action == InventoryAction.PLACE_ALL)
+				|| (action == InventoryAction.PLACE_ONE)
+				|| (action == InventoryAction.PLACE_SOME)
+				|| (action == InventoryAction.SWAP_WITH_CURSOR)) {
+			ItemStack item = event.getCursor();
+
+			if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+				if (event.getInventory() == event.getClickedInventory())
+					return;
+				inv = event.getInventory();
+				item = event.getCurrentItem();
+			}
+
+			if ((inv.getHolder() instanceof MineInventoryInventory)) {
+				HumanEntity hentity = (Player) event.getWhoClicked();
+
+				if ((hentity instanceof Player)) {
+					player = (Player) hentity;
+
+					int iid = item.getTypeId();
+
+					List<Integer> blist = this.plugin.getreader()
+							.getItemBlackList();
+
+					if (blist.contains(Integer.valueOf(iid))) {
+						if (!this.plugin.getPermissionHandler().has(player,
+								"mi.admin")) {
+							event.setCancelled(true);
+							player.sendMessage(ChatColor.RED
+									+ "该类型的物品被禁止放入扩展背包中");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	public void onChestOpen(InventoryOpenEvent ioe) {
+		if (ioe.isCancelled()) {
+			return;
+		}
+		Inventory inv = ioe.getInventory();
+
+		if (inv.getType() != InventoryType.CHEST) {
+			return;
+		}
+		if ((inv.getHolder() instanceof MineInventoryInventory)) {
+			String playername = ioe.getPlayer().getName();
+			Player player = this.plugin.getServer().getPlayer(playername);
+			if (((MineInventoryInventory) inv.getHolder()).locked()) {
+				if (!this.plugin.getPermissionHandler().has(player, "mi.admin")) {
+					ioe.setCancelled(true);
+					player.sendMessage(ChatColor.RED + "你想要查看的背包已被锁定");
+				}
+			}
+			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onPlayerLogin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		this.plugin.loadInventory(player.getName());
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onPlayerInventoryOpen(InventoryOpenEvent event) {
+		Inventory inv = event.getInventory();
+
 		Player player = (Player) event.getPlayer();
 
-		//Bukkit.broadcastMessage("1");
-		if(inv.getHolder() instanceof MineInventoryInventory){
-
-			//Bukkit.broadcastMessage("2");
-
-			if(player.getName().equalsIgnoreCase(((MineInventoryInventory)inv.getHolder()).getOwner())){
-				plugin.getChannel().sendOpen(player);
-				((MineInventoryInventory)inv.getHolder()).stat = true;	
-			}
+		if ((inv instanceof FurnaceInventory))
 			return;
+		if ((inv.getHolder() instanceof MineInventoryInventory)) {
+			if (((MineInventoryInventory) inv.getHolder()).getOwner() != null) {
+				if (player.getName().equalsIgnoreCase(
+						((MineInventoryInventory) inv.getHolder()).getOwner()
+								.getName())) {
+					((MineInventoryInventory) inv.getHolder()).stat = true;
+				}
+				return;
+			}
 		}
-		
 	}
 }

@@ -1,14 +1,11 @@
 package com.yueou.MineInventory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
+import java.util.List;
+import java.util.logging.Logger;
 
 public class MineInventoryConfigReader {
 
+    Logger log = Logger.getLogger("Minecraft");
 
      private String host;
      private String port;
@@ -16,65 +13,32 @@ public class MineInventoryConfigReader {
      private String userName;
      private String pw;
      private String pre;
-     private File config = new File("plugins" + File.separatorChar + "MineInventory" + File.separatorChar + "MineInventory.properties");
-     private float createprice;
-     private float updateprice;
+     private Double createprice;
+     private List<Double> updateprices;
+     private List<String> bagName;
+     private List<Integer> itemBlackList;
+     private boolean debug;
+     public static MineInventoryConfigReader instance;
      
     public MineInventoryConfigReader()
      {
-        String thisLine;
-        
-       try
-        {
-               BufferedReader read = new BufferedReader(new InputStreamReader(new FileInputStream(config)));
-                
-               while((thisLine = read.readLine()) != null)
-                {
-                        if(thisLine.startsWith("#")) continue; 
-                       if(thisLine.equals("")) continue;
-                        else if(thisLine.contains("SQLHost"))
-                        {
-                                host = thisLine.replace("SQLHost=", "");
-                        }
-                        else if(thisLine.contains("SQLPort"))
-                        {
-                                port = thisLine.replace("SQLPort=", "");
-                        }
-                        else if(thisLine.contains("SQLDataBase"))
-                        {
-                                dbName = thisLine.replace("SQLDataBase=", "");
-                        }
-                        else if(thisLine.contains("SQLUserName"))
-                        {
-                                userName = thisLine.replace("SQLUserName=", "");
-                        }
-                        else if(thisLine.contains("SQLPassword"))
-                        {
-                                pw = thisLine.replace("SQLPassword=", "");
-                        }
-                        else if(thisLine.contains("SQLTablePrefix"))
-                        {
-                                pre = thisLine.replace("SQLTablePrefix=", "");
-                        }
-                        else if(thisLine.contains("InventoryCreatePrice"))
-                        {
-                        		createprice = Float.parseFloat(thisLine.replace("InventoryCreatePrice=", ""));
-                        }
-                        else if(thisLine.contains("InventoryLevelupPrice"))
-                        {
-                        		updateprice = Float.parseFloat(thisLine.replace("InventoryLevelupPrice=", ""));
-                        }
-                }
-                read.close();
+    	instance = this;
+    	   host = MineInventory.config.getString("Database.MySQL.Host");
+    	   port = MineInventory.config.getString("Database.MySQL.Port");
+    	   dbName = MineInventory.config.getString("Database.MySQL.Database");
+    	   userName = MineInventory.config.getString("Database.MySQL.User");
+    	   pw = MineInventory.config.getString("Database.MySQL.Password");
+    	   pre = MineInventory.config.getString("Database.MySQL.Prefix");
+    	   createprice = MineInventory.config.getDouble("Main.Price.Create");
+    	   updateprices = MineInventory.config.getDoubleList("Main.Price.Update");
+    	   bagName = MineInventory.config.getStringList("Main.BagName");
+    	   itemBlackList = MineInventory.config.getIntegerList("Main.ItemBlackList");
+    	   debug = MineInventory.config.getBoolean("Main.Debug");
+    	   
 
-       }
-        catch (IOException e)
-        {
-                e.printStackTrace();
-        }
-
+    	   
+            	   
      }
-
      
      public String getHostname()
      {
@@ -105,13 +69,29 @@ public class MineInventoryConfigReader {
      {
              return pre;
      }
-     public float getCreatePrice()
+     public double getCreatePrice()
      {
              return createprice;
      }
+
      
-     public float getUpdatePrice()
+     public List<Double> getPrices()
      {
-             return updateprice;
+             return updateprices;
      }    
+
+     
+     public List<String> getBagNameList()
+     {
+             return bagName;
+     }    
+     
+     public List<Integer> getItemBlackList(){
+    	 return itemBlackList;
+     }
+     
+     public boolean isDebug()
+     {
+             return debug;
+	}
 }
